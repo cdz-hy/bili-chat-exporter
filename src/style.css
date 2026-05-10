@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Shadow DOM 样式隔离重置 */
+@layer base {
+  :host {
+    all: initial;
+    visibility: visible;
+  }
+
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: #e5e7eb;
+  }
+
+  body {
+    @apply plasmo-m-0 plasmo-p-0;
+  }
+
+  /* Lucide 图标尺寸修复 */
+  svg {
+    display: block;
+    vertical-align: middle;
+  }
+
+  button {
+    cursor: pointer;
+    background-color: transparent;
+    background-image: none;
+  }
+}

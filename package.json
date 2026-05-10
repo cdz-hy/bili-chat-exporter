@@ -1,0 +1,42 @@
+{
+  "name": "bilibili-chat-exporter",
+  "displayName": "Bili Chat Exporter",
+  "version": "0.1.0",
+  "description": "Bilibili 私信导出插件",
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package"
+  },
+  "dependencies": {
+    "plasmo": "0.90.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "lucide-react": "^0.300.0",
+    "framer-motion": "^10.16.4",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "@plasmohq/storage": "^1.9.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "latest",
+    "@types/node": "latest",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.2.2"
+  },
+  "manifest": {
+    "host_permissions": [
+      "https://api.vc.bilibili.com/*",
+      "https://message.bilibili.com/*",
+      "https://*.hdslb.com/*"
+    ],
+    "permissions": [
+      "storage",
+      "tabs"
+    ]
+  }
+}
