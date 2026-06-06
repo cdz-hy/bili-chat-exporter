@@ -28,8 +28,11 @@ export function parseMessageContent(rawContent: string, msgType: number): Parsed
             case 5: // 撤回
                 return { text: data.content || data.text || "[撤回消息]", type_info: "text", revoked: true }
 
-            case 7: // 视频分享（简版）
-                return { text: `[视频分享] ${data.title || ""}`, image: data.cover || data.pic, url: data.jump_url, type_info: "video" }
+            case 7: { // 视频分享（简版）
+                const cover = data.cover || data.pic || data.thumb || ""
+                const videoUrl = data.jump_url || (data.bvid ? `https://www.bilibili.com/video/${data.bvid}` : data.id ? `https://www.bilibili.com/video/av${data.id}` : "")
+                return { text: `[视频分享] ${data.title || ""}`, image: cover, url: videoUrl, bvid: data.bvid, aid: data.id, type_info: "video" }
+            }
 
             case 10: // 通知
                 return { text: `${data.title || "[通知]"}\n${data.text || ""}`, type_info: "system" }
@@ -55,15 +58,15 @@ export function parseMessageContent(rawContent: string, msgType: number): Parsed
                     return { text: data.content || "[系统提示]", type_info: "system" }
                 }
 
-            case 25: return { text: `[音频] ${data.title || ""}`, image: data.cover, type_info: "share" }
-            case 26: return { text: `[歌单] ${data.title || ""}`, image: data.cover, type_info: "share" }
-            case 27: return { text: `[直播间] ${data.title || ""}\n主播：${data.uname || ""}`, image: data.cover, type_info: "share" }
-            case 28: return { text: `[番剧] ${data.title || ""}`, image: data.cover, type_info: "video" }
-            case 29: return { text: `[漫画] ${data.title || ""}`, image: data.cover, type_info: "share" }
-            case 30: return { text: `[装扮] ${data.title || ""}`, image: data.cover, type_info: "share" }
-            case 31: return { text: `[小视频] ${data.title || ""}`, image: data.cover, type_info: "video" }
-            case 32: return { text: `[相簿] ${data.title || ""}`, image: data.cover, type_info: "share" }
-            case 33: return { text: `[活动] ${data.title || ""}`, image: data.cover, type_info: "share" }
+            case 25: return { text: `[音频] ${data.title || ""}`, image: data.cover || data.pic || data.thumb, url: data.jump_url || data.url || data.link, type_info: "share" }
+            case 26: return { text: `[歌单] ${data.title || ""}`, image: data.cover || data.pic || data.thumb, url: data.jump_url || data.url || data.link, type_info: "share" }
+            case 27: return { text: `[直播间] ${data.title || ""}\n主播：${data.uname || ""}`, image: data.cover || data.pic || data.thumb, url: data.jump_url || data.url || data.link, type_info: "share" }
+            case 28: return { text: `[番剧] ${data.title || ""}`, image: data.cover || data.pic || data.thumb, url: data.jump_url || data.url || data.link, type_info: "video" }
+            case 29: return { text: `[漫画] ${data.title || ""}`, image: data.cover || data.pic || data.thumb, url: data.jump_url || data.url || data.link, type_info: "share" }
+            case 30: return { text: `[装扮] ${data.title || ""}`, image: data.cover || data.pic || data.thumb, url: data.jump_url || data.url || data.link, type_info: "share" }
+            case 31: return { text: `[小视频] ${data.title || ""}`, image: data.cover || data.pic || data.thumb, url: data.jump_url || data.url || data.link, type_info: "video" }
+            case 32: return { text: `[相簿] ${data.title || ""}`, image: data.cover || data.pic || data.thumb, url: data.jump_url || data.url || data.link, type_info: "share" }
+            case 33: return { text: `[活动] ${data.title || ""}`, image: data.cover || data.pic || data.thumb, url: data.jump_url || data.url || data.link, type_info: "share" }
             case 51: return { text: `[小程序] ${data.title || ""}`, type_info: "system" }
             case 306: return { text: data.content || "[粉丝团提示]", type_info: "system" }
 
