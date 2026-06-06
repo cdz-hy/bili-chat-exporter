@@ -25,12 +25,19 @@ function download(url: string, fileName: string): void {
 }
 
 // 导出消息为 JSON 文件并触发下载
-export function exportToJSON(talkerId: string, messages: BiliMsg[], talkerName?: string): void {
+export function exportToJSON(
+    talkerId: string,
+    messages: BiliMsg[],
+    talkerName?: string,
+    emoteMap?: Record<string, string>
+): void {
     const exportData = {
-        version: "1.0",
+        version: "1.1",
         exportTime: new Date().toISOString(),
         talkerId,
+        talkerName,
         messageCount: messages.length,
+        emoteMap: emoteMap || {},
         messages: messages.map(msg => ({
             sender_uid: msg.sender_uid,
             receiver_id: msg.receiver_id,

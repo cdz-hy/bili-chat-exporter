@@ -1,11 +1,10 @@
 import type { PlasmoCSConfig, PlasmoGetOverlayAnchor, PlasmoGetStyle } from "plasmo"
 import { useState, useEffect, useRef } from "react"
-import { Download, X, MessageSquare, FileJson, FileText } from "lucide-react"
+import { Download, X, MessageSquare, FileJson, FileText, Globe, FileArchive } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStorage } from "@plasmohq/storage/hook"
 import { syncAllMessages, getUserInfo, type BiliMsg } from "./core/api"
-import { exportToJSON } from "./core/exporters/json"
-import { exportToPDF } from "./core/exporters/pdf"
+import { exportToJSON, exportToPDF, exportToHTML, exportToZIP } from "./core/exporters"
 import { DEFAULT_CONFIG, STORAGE_KEYS, type ExportConfig } from "./core/storage"
 import cssText from "data-text:./style.css"
 
@@ -104,6 +103,31 @@ const BiliChatExporterUI = () => {
         }
     }
 
+    // HTML 导出流程
+    const handleHTMLExport = async () => {
+        if (!talkerId) return
+        setIsExporting(true)
+        setProgressText("正在获取用户信息...")
+        try {
+            const userInfo = await getUserInfo(talkerId)
+            const talkerName = userInfo?.name || talkerId
+
+            setProgressText("正在同步历史消息...")
+            const result = await syncAllMessages(talkerId, m => {
+                setMessages(m)
+                setProgressText(`已同步 ${m.length} 条消息...`)
+            })
+
+            await exportToHTML(talkerId, result.messages, exportConfig, talkerName, result.emoteMap, status => {
+                setProgressText(status)
+            })
+        } catch (e: any) {
+            alert("HTML 导出中断: " + e.message)
+        } finally {
+            setIsExporting(false)
+        }
+    }
+
     // JSON 导出流程
     const handleJSONExport = async () => {
         if (!talkerId) return
@@ -113,16 +137,41 @@ const BiliChatExporterUI = () => {
             const userInfo = await getUserInfo(talkerId)
             const talkerName = userInfo?.name || talkerId
 
-            setProgressText("正在准备 JSON 数据...")
+            setProgressText("正在同步历史消息...")
             const result = await syncAllMessages(talkerId, m => {
                 setMessages(m)
                 setProgressText(`已同步 ${m.length} 条消息...`)
             })
 
-            exportToJSON(talkerId, result.messages, talkerName)
+            exportToJSON(talkerId, result.messages, talkerName, result.emoteMap)
             setProgressText("导出完成！")
         } catch (e: any) {
             alert("JSON 导出失败: " + e.message)
+        } finally {
+            setIsExporting(false)
+        }
+    }
+
+    // ZIP 媒体打包流程
+    const handleZIPExport = async () => {
+        if (!talkerId) return
+        setIsExporting(true)
+        setProgressText("正在获取用户信息...")
+        try {
+            const userInfo = await getUserInfo(talkerId)
+            const talkerName = userInfo?.name || talkerId
+
+            setProgressText("正在同步历史消息...")
+            const result = await syncAllMessages(talkerId, m => {
+                setMessages(m)
+                setProgressText(`已同步 ${m.length} 条消息...`)
+            })
+
+            await exportToZIP(talkerId, result.messages, talkerName, status => {
+                setProgressText(status)
+            })
+        } catch (e: any) {
+            alert("打包媒体失败: " + e.message)
         } finally {
             setIsExporting(false)
         }
@@ -192,19 +241,32 @@ const BiliChatExporterUI = () => {
                                             </div>
                                             <span className="plasmo-font-bold plasmo-text-gray-800 plasmo-text-sm">导出 PDF</span>
                                         </motion.button>
+                                        <motion.button whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }} onClick={handleHTMLExport} className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-gap-3 plasmo-p-5 plasmo-bg-gradient-to-br plasmo-from-pink-50 plasmo-to-purple-100/50 plasmo-border plasmo-border-pink-200 plasmo-rounded-2xl hover:plasmo-shadow-md plasmo-transition-all plasmo-group">
+                                            <div className="plasmo-p-2 plasmo-bg-white plasmo-rounded-xl plasmo-shadow-sm">
+                                                <Globe size={20} className="plasmo-text-bili-pink group-hover:plasmo-scale-110 plasmo-transition-transform" />
+                                            </div>
+                                            <span className="plasmo-font-bold plasmo-text-gray-800 plasmo-text-sm">导出 HTML</span>
+                                        </motion.button>
                                         <motion.button whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }} onClick={handleJSONExport} className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-gap-3 plasmo-p-5 plasmo-bg-gradient-to-br plasmo-from-blue-50 plasmo-to-blue-100/50 plasmo-border plasmo-border-blue-200 plasmo-rounded-2xl hover:plasmo-shadow-md plasmo-transition-all plasmo-group">
                                             <div className="plasmo-p-2 plasmo-bg-white plasmo-rounded-xl plasmo-shadow-sm">
                                                 <FileJson size={20} className="plasmo-text-bili-blue group-hover:plasmo-scale-110 plasmo-transition-transform" />
                                             </div>
                                             <span className="plasmo-font-bold plasmo-text-gray-800 plasmo-text-sm">导出 JSON</span>
                                         </motion.button>
+                                        <motion.button whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }} onClick={handleZIPExport} className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-gap-3 plasmo-p-5 plasmo-bg-gradient-to-br plasmo-from-indigo-50 plasmo-to-indigo-100/50 plasmo-border plasmo-border-indigo-200 plasmo-rounded-2xl hover:plasmo-shadow-md plasmo-transition-all plasmo-group">
+                                            <div className="plasmo-p-2 plasmo-bg-white plasmo-rounded-xl plasmo-shadow-sm">
+                                                <FileArchive size={20} className="plasmo-text-indigo-600 group-hover:plasmo-scale-110 plasmo-transition-transform" />
+                                            </div>
+                                            <span className="plasmo-font-bold plasmo-text-gray-800 plasmo-text-sm">打包媒体 ZIP</span>
+                                        </motion.button>
                                     </motion.div>
+
                                 )}
                             </AnimatePresence>
 
                             {/* 底部 */}
                             <div className="plasmo-mt-8 plasmo-pt-6 plasmo-border-t plasmo-border-gray-100 plasmo-flex plasmo-justify-center">
-                                <p className="plasmo-text-[10px] plasmo-text-gray-300">Bili Chat Exporter v0.1.0beta</p>
+                                <p className="plasmo-text-[10px] plasmo-text-gray-300">Bili Chat Exporter v0.2.0</p>
                             </div>
                         </motion.div>
                     </motion.div>

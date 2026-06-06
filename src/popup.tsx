@@ -1,5 +1,5 @@
 import { useStorage } from "@plasmohq/storage/hook"
-import { Download, ExternalLink, Github, MessageCircle, FileText, CheckCircle2, Sparkles } from "lucide-react"
+import { Download, ExternalLink, Github, MessageCircle, FileText, CheckCircle2, Sparkles, Eye } from "lucide-react"
 import { useState } from "react"
 import { DEFAULT_CONFIG, STORAGE_KEYS, TitleFormat, type ExportConfig } from "./core/storage"
 import { motion, AnimatePresence } from "framer-motion"
@@ -32,7 +32,7 @@ const IndexPopup = () => {
                     </div>
                     <div>
                         <h1 className="plasmo-text-lg plasmo-font-black plasmo-text-gray-900">Bili Chat Exporter</h1>
-                        <p className="plasmo-text-[10px] plasmo-text-gray-400 plasmo-font-bold plasmo-tracking-widest plasmo-uppercase">v0.1.0beta</p>
+                        <p className="plasmo-text-[10px] plasmo-text-gray-400 plasmo-font-bold plasmo-tracking-widest plasmo-uppercase">v0.2.0</p>
                     </div>
                 </motion.div>
 
@@ -68,6 +68,18 @@ const IndexPopup = () => {
                                 <div className="plasmo-flex plasmo-items-center plasmo-gap-3">
                                     <MessageCircle size={18} />
                                     <span>进入私信页面</span>
+                                </div>
+                                <ExternalLink size={16} />
+                            </motion.button>
+                            <motion.button 
+                                whileHover={{ scale: 1.02 }} 
+                                whileTap={{ scale: 0.98 }} 
+                                onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL("tabs/viewer.html") })}
+                                className="plasmo-w-full plasmo-flex plasmo-items-center plasmo-justify-between plasmo-p-4 plasmo-bg-gradient-to-r plasmo-from-blue-500 plasmo-to-bili-blue plasmo-text-white plasmo-rounded-2xl plasmo-font-bold plasmo-shadow-md plasmo-shadow-blue-200 plasmo-transition-all"
+                            >
+                                <div className="plasmo-flex plasmo-items-center plasmo-gap-3">
+                                    <Eye size={18} />
+                                    <span>打开离线阅读器</span>
                                 </div>
                                 <ExternalLink size={16} />
                             </motion.button>
